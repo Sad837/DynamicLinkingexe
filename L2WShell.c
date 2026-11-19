@@ -6,7 +6,7 @@
 #define MAX_LINE 1024
 #define MAX_ARGS 16
 
-typedef int (__stdcall *ParseCommandFn)(char *, char *[], int);
+typedef int (__cdecl *ParseCommandFn)(char *, char *[], int);
 typedef int (__stdcall *ExecuteCommandFn)(const char *, const char *const [], int);
 
 typedef struct {
@@ -83,7 +83,7 @@ static int dispatch(char *args[], int argc, ExecuteCommandFn execute)
         if (!GetConsoleScreenBufferInfo(h, &info)) return 1;
         cells = (DWORD)info.dwSize.X * (DWORD)info.dwSize.Y;
         if (!FillConsoleOutputCharacterA(h, ' ', cells, origin, &written)) return 1;
-        if (!FillConsoleOutputAttribute(h, info.dwAttributes, cells, origin, &written)) return 1;
+        if (!FillConsoleOutputAttribute(h, info.wAttributes, cells, origin, &written)) return 1;
         if (!SetConsoleCursorPosition(h, origin)) return 1;
         return 0;
     }
@@ -106,19 +106,19 @@ int main(void)
     char *args[MAX_ARGS];
     int argc;
 
-    dll = LoadLibraryA("L2WShell2.dll");
+    dll = LoadLibraryA("C:\\Users\\Student\\source\\repos\\Sad837\\DLL\\DLL_Project2\\Debug\\DLL_Project2.dll");
     if (!dll) {
         fprintf(stderr, "Unable to load L2WShell.dll: %lu\n", GetLastError());
         return 1;
     }
-    parse = (ParseCommandFn)GetProcAddress(dll, "ParseCmd");
-    execute = (ExecuteCommandFn)GetProcAddress(dll, "ExecuteCmd");
+    parse = (ParseCommandFn)GetProcAddress(dll, "ParseCommand");
+    execute = (ExecuteCommandFn)GetProcAddress(dll, "_ExecuteCommand@12");
     if (!parse || !execute) {
         fprintf(stderr, "Missing required DLL export.\n");
         FreeLibrary(dll);
         return 1;
     }
-    FreeLibrary(dll);
+   // FreeLibrary(dll);
     puts("L2WShell - Linux commands on Windows. Type help.");
     for (;;) {
         fputs("l2w> ", stdout);
